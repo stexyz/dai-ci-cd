@@ -11,7 +11,6 @@ pipeline {
 
     // Setup job options.
     options {
-        ansiColor('xterm')
         timestamps()
         timeout(time: 60, unit: 'MINUTES')
         // holding last 10 builds
