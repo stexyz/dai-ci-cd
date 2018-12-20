@@ -56,7 +56,7 @@ pipeline {
             steps {
                 script {
                     echo "Training a DAI model with 1-1-10 settings on dataset [${NEW_DATASET}]."
-                    def EXPERIMENT = sh(script: "python3 run_experiment.py ${DAI_URL} 1 1 10", returnStdout: true).trim()
+                    def EXPERIMENT = sh(script: "python3 run_experiment.py ${DAI_URL} ${NEW_DATASET} 1 1 10", returnStdout: true).trim()
                     echo "Experiment ${EXPERIMENT} finished."
                 }
             }
