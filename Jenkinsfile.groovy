@@ -70,7 +70,7 @@ pipeline {
             steps {
                 script {
                     echo "Validating performance of the model ${EXPERIMENT_NAME}."
-                    def EXPERIMENT_SCORE = sh(script: "python3 check_model_score.py ${DAI_URL} ${EXPERIMENT_NAME}", returnStdout: true).trim()
+                    def EXPERIMENT_SCORE = sh(script: "python3 check_model_score.py ${DAI_URL} ${EXPERIMENT_NAME}", returnStdout: true).trim() as Double
                     if (EXPERIMENT_SCORE <= 0.5){
                         echo "Model score [${EXPERIMENT_SCORE}] was too low, failing pipeline build."
                         exit 1;
