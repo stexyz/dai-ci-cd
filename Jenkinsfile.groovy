@@ -1,7 +1,10 @@
 #!/usr/bin/groovy
 
 NODE_LABEL = 'master'
-DAI_URL = 'http://107.22.76.86:12345'
+// TODO: use CLI to get the IP based on instance id; https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-instances.html
+// or aws ec2 describe-instances --filters 'Name=tag:Name,Values=XXXXXX' --output text --query 'Reservations[].Instances[].[PrivateIpAddress,Tags[?Key==`Name`].Value[]]'
+// prob replace PrivateIpAdress with PublicIpAddress
+DAI_URL = 'http://34.207.204.96:12345'
 S3_DATA_SET_LOCATION = 'https://s3.amazonaws.com/h2o-public-test-data/smalldata/kaggle/CreditCard/creditcard_train_cat.csv'
 GIT_REPO = 'https://github.com/stexyz/dai-ci-cd'
 def NEW_DATASET = null
@@ -60,6 +63,22 @@ pipeline {
                     echo "Experiment ${EXPERIMENT} finished."
                 }
             }
+        }
+
+        stage('check-model-score') {
+            agent { label NODE_LABEL }
+            steps {
+                script {
+                    echo "Validating performance of the model ${EXPERIMENT}."
+                    def EXPERIMENT_SCORE = sh(script: "python3 check_model_score.py ${DAI_URL} ${EXPERIMENT}", returnStdout: true).trim()
+                    if (EXPERIMENT_SCORE <= 0.5){
+                        echo "Model score [${EXPERIMENT_SCORE}] was too low, failing pipeline build."
+                        exit 1;
+                    }
+                    echo "Model score [${EXPERIMENT_SCORE}] was good enough, proceeding with the pipeline."
+                }
+            }
+
         }        
     }
 }
