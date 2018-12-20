@@ -19,9 +19,9 @@ experiment = h2oai.start_experiment_sync(dataset_key = sys.argv[2],
                                          # testset_key = test.key,
                                          target_col = target,
                                          is_classification = True,
-                                         accuracy = sys.argv[3],
-                                         time = sys.argv[4],
-                                         interpretability = sys.argv[5],
+                                         accuracy = int(sys.argv[3]),
+                                         time = int(sys.argv[4]),
+                                         interpretability = int(sys.argv[5]),
                                          scorer = "AUC",
                                          seed = 1234)
 
