@@ -48,5 +48,17 @@ pipeline {
                 }
             }
         }
+
+        // Run an experiment with the dataset
+        stage('run-experiment') {
+            agent { label NODE_LABEL }
+            steps {
+                script {
+                    echo "Training a DAI model with 1-1-10 settings on dataset [${NEW_DATASET}]."
+                    def EXPERIMENT = sh(script: "run_experiment.py ${DAI_URL} 1 1 10", returnStdout: true).trim()
+                    echo "Experiment ${EXPERIMENT} finished."
+                }
+            }
+        }        
     }
 }
