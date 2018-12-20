@@ -32,7 +32,7 @@ pipeline {
                     //wget the python h2o_client and install it
                     //TODO SP: maybe this should also be part of the imports/@Library section; this is, however, more portable
                     sh "wget ${DAI_URL}/static/h2oai_client-1.4.2-py3-none-any.whl"
-                    sh "pip install h2oai_client-1.4.2-py3-none-any.whl"
+                    sh "/usr/local/bin/pip install h2oai_client-1.4.2-py3-none-any.whl"
                 }
             }
         }
