@@ -44,7 +44,7 @@ pipeline {
             steps {
                 script {
                     echo "Loading dataset [${S3_DATA_SET_LOCATION}] to Driverless AI running at ${DAI_URL}."
-                    NEW_DATASET = sh(script: "python upload_new_dataset.py ${DAI_URL} ${S3_DATA_SET_LOCATION}", returnStdout: true).trim()
+                    NEW_DATASET = sh(script: "python3 upload_new_dataset.py ${DAI_URL} ${S3_DATA_SET_LOCATION}", returnStdout: true).trim()
                 }
             }
         }
