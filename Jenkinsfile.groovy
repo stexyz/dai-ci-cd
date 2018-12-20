@@ -1,7 +1,7 @@
 #!/usr/bin/groovy
 
 NODE_LABEL = 'master'
-DAI_URL = 'http://34.229.38.81:12345'
+DAI_URL = 'http://54.147.198.177:12345'
 S3_DATA_SET_LOCATION = 'https://s3.amazonaws.com/h2o-public-test-data/smalldata/kaggle/CreditCard/creditcard_train_cat.csv'
 def NEW_DATASET = null
 
