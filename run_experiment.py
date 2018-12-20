@@ -28,4 +28,4 @@ experiment = h2oai.start_experiment_sync(dataset_key = sys.argv[2],
 
 
 # output the key of the experiment so that next build step in Jenkins can use it
-print(experiment)
+print(experiment.key)

@@ -59,8 +59,8 @@ pipeline {
             steps {
                 script {
                     echo "Training a DAI model with 1-1-10 settings on dataset [${NEW_DATASET}]."
-                    def EXPERIMENT = sh(script: "python3 run_experiment.py ${DAI_URL} ${NEW_DATASET} 1 1 10", returnStdout: true).trim()
-                    echo "Experiment ${EXPERIMENT} finished."
+                    EXPERIMENT_NAME = sh(script: "python3 run_experiment.py ${DAI_URL} ${NEW_DATASET} 1 1 10", returnStdout: true).trim()
+                    echo "Experiment ${EXPERIMENT_NAME} finished."
                 }
             }
         }
@@ -69,8 +69,8 @@ pipeline {
             agent { label NODE_LABEL }
             steps {
                 script {
-                    echo "Validating performance of the model ${EXPERIMENT}."
-                    def EXPERIMENT_SCORE = sh(script: "python3 check_model_score.py ${DAI_URL} ${EXPERIMENT}", returnStdout: true).trim()
+                    echo "Validating performance of the model ${EXPERIMENT_NAME}."
+                    def EXPERIMENT_SCORE = sh(script: "python3 check_model_score.py ${DAI_URL} ${EXPERIMENT_NAME}", returnStdout: true).trim()
                     if (EXPERIMENT_SCORE <= 0.5){
                         echo "Model score [${EXPERIMENT_SCORE}] was too low, failing pipeline build."
                         exit 1;
