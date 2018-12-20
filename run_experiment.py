@@ -12,11 +12,10 @@ password = 'h2oai'
 h2oai = Client(address = address, username = username, password = password)
 # make sure to use the same user name and password when signing in through the GUI
 
-train = sys.argv[2]
 # TODO solve better params passing so that we can get some logs here; now we only can output experiment name so that Jenkins can consume it
 # print("About to start experiment with accuracy=[", sys.argv[2], "], time=[", sys.argv[3], "], interpretability=[",sys.argv[4],"].")
 # start experiment synchronously
-experiment = h2oai.start_experiment_sync(dataset_key = train.key,
+experiment = h2oai.start_experiment_sync(dataset_key = sys.argv[2],
                                          # testset_key = test.key,
                                          target_col = target,
                                          is_classification = True,
