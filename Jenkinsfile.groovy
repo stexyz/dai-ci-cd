@@ -3,6 +3,7 @@
 NODE_LABEL = 'master'
 DAI_URL = 'http://54.147.198.177:12345'
 S3_DATA_SET_LOCATION = 'https://s3.amazonaws.com/h2o-public-test-data/smalldata/kaggle/CreditCard/creditcard_train_cat.csv'
+GIT_REPO = 'https://github.com/stexyz/dai-ci-cd'
 def NEW_DATASET = null
 
 pipeline {
@@ -27,12 +28,12 @@ pipeline {
                     deleteDir()
 
                     // checkout git
-                    git ' https://github.com/stexyz/dai-ci-cd'
-
+                    git "${GIT_REPO}"
+                    echo 'Checked out github repo with scripts.'
                     //wget the python h2o_client and install it
                     //TODO SP: maybe this should also be part of the imports/@Library section; this is, however, more portable
-                    sh "wget ${DAI_URL}/static/h2oai_client-1.4.2-py3-none-any.whl"
-                    sh "/usr/local/bin/pip install h2oai_client-1.4.2-py3-none-any.whl"
+                    // sh "wget ${DAI_URL}/static/h2oai_client-1.4.2-py3-none-any.whl"
+                    // sh "/usr/local/bin/pip install h2oai_client-1.4.2-py3-none-any.whl"
                 }
             }
         }
