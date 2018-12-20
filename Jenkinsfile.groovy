@@ -4,7 +4,7 @@ NODE_LABEL = 'master'
 // TODO: use CLI to get the IP based on instance id; https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-instances.html
 // or aws ec2 describe-instances --filters 'Name=tag:Name,Values=XXXXXX' --output text --query 'Reservations[].Instances[].[PrivateIpAddress,Tags[?Key==`Name`].Value[]]'
 // prob replace PrivateIpAdress with PublicIpAddress
-DAI_URL = 'http://34.207.204.96:12345'
+DAI_URL = 'http://54.81.209.97:12345'
 S3_DATA_SET_LOCATION = 'https://s3.amazonaws.com/h2o-public-test-data/smalldata/kaggle/CreditCard/creditcard_train_cat.csv'
 GIT_REPO = 'https://github.com/stexyz/dai-ci-cd'
 def NEW_DATASET = null
