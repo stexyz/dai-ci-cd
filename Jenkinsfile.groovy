@@ -51,7 +51,7 @@ pipeline {
             steps {
                 script {
                     echo "Loading dataset [${S3_DATA_SET_LOCATION}] to Driverless AI running at ${DAI_URL}."
-                    NEW_DATASET = sh(script: "python3 upload_new_dataset.py ${DAI_URL} ${DAI_PASSWORD} ${DAI_USERNAME} ${S3_DATA_SET_LOCATION}", returnStdout: true).trim()
+                    NEW_DATASET = sh(script: "python3 upload_new_dataset.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${S3_DATA_SET_LOCATION}", returnStdout: true).trim()
                 }
             }
         }
@@ -62,7 +62,7 @@ pipeline {
             steps {
                 script {
                     echo "Training a DAI model with 1-1-10 settings on dataset [${NEW_DATASET}]."
-                    EXPERIMENT_NAME = sh(script: "python3 run_experiment.py ${DAI_URL} ${DAI_PASSWORD} ${DAI_USERNAME} ${NEW_DATASET} 1 1 10", returnStdout: true).trim()
+                    EXPERIMENT_NAME = sh(script: "python3 run_experiment.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${NEW_DATASET} 1 1 10", returnStdout: true).trim()
                     echo "Experiment ${EXPERIMENT_NAME} finished."
                 }
             }
@@ -73,7 +73,7 @@ pipeline {
             steps {
                 script {
                     echo "Validating performance of the model ${EXPERIMENT_NAME}."
-                    def EXPERIMENT_SCORE = sh(script: "python3 check_model_score.py ${DAI_URL} ${DAI_PASSWORD} ${DAI_USERNAME} ${EXPERIMENT_NAME}", returnStdout: true).trim() as Double
+                    def EXPERIMENT_SCORE = sh(script: "python3 check_model_score.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${EXPERIMENT_NAME}", returnStdout: true).trim() as Double
                     if (EXPERIMENT_SCORE <= 0.5){
                         echo "Model score [${EXPERIMENT_SCORE}] was too low, failing pipeline build."
                         exit 1;
@@ -89,7 +89,7 @@ pipeline {
                 script {
                     echo "Downloading mojo for experiment [${EXPERIMENT_NAME}]."
                     
-                    def EXPERIMENT_SCORE = sh(script: "python3 download_mojo.py ${DAI_URL} ${DAI_PASSWORD} ${DAI_USERNAME} ${EXPERIMENT_NAME}", returnStdout: true).trim() as Double
+                    def EXPERIMENT_SCORE = sh(script: "python3 download_mojo.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${EXPERIMENT_NAME}", returnStdout: true).trim() as Double
                     if (EXPERIMENT_SCORE <= 0.5){
                         echo "Model score [${EXPERIMENT_SCORE}] was too low, failing pipeline build."
                         exit 1;
