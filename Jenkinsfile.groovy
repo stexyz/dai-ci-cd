@@ -4,7 +4,8 @@ NODE_LABEL = 'master'
 // TODO: use CLI to get the IP based on instance id; https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-instances.html
 // or aws ec2 describe-instances --filters 'Name=tag:Name,Values=XXXXXX' --output text --query 'Reservations[].Instances[].[PrivateIpAddress,Tags[?Key==`Name`].Value[]]'
 // prob replace PrivateIpAdress with PublicIpAddress
-DAI_URL = 'http://54.81.209.97:12345'
+// DAI_URL = 'http://54.81.209.97:12345'
+DAI_URL = 'http://stefan-puddle-dai-142-cpu-small2-puddle.h2o.ai'
 S3_DATA_SET_LOCATION = 'https://s3.amazonaws.com/h2o-public-test-data/smalldata/kaggle/CreditCard/creditcard_train_cat.csv'
 GIT_REPO = 'https://github.com/stexyz/dai-ci-cd'
 def NEW_DATASET = null
@@ -78,7 +79,22 @@ pipeline {
                     echo "Model score [${EXPERIMENT_SCORE}] was good enough, proceeding with the pipeline."
                 }
             }
-
         }        
+
+        stage('download-mojo'){
+            agent { label NODE_LABEL }
+            steps {
+                script {
+                    echo "Downloading mojo for experiment [${EXPERIMENT_NAME}]."
+                    
+                    def EXPERIMENT_SCORE = sh(script: "python3 check_model_score.py ${DAI_URL} ${EXPERIMENT_NAME}", returnStdout: true).trim() as Double
+                    if (EXPERIMENT_SCORE <= 0.5){
+                        echo "Model score [${EXPERIMENT_SCORE}] was too low, failing pipeline build."
+                        exit 1;
+                    }
+                    echo "Model score [${EXPERIMENT_SCORE}] was good enough, proceeding with the pipeline."
+                }
+            }
+        }
     }
 }
