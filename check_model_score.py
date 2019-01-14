@@ -12,6 +12,6 @@ h2oai = Client(address = address, username = username, password = password)
 
 # load model summary and output the score
 # TODO: possibly do checks here if we need to validate more
-experiment_name = sys.argv[2]
+experiment_name = sys.argv[4]
 model = h2oai.get_model_summary(experiment_name)
 print(model.score)
