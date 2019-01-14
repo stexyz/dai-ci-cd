@@ -4,8 +4,10 @@ NODE_LABEL = 'master'
 // TODO: use CLI to get the IP based on instance id; https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-instances.html
 // or aws ec2 describe-instances --filters 'Name=tag:Name,Values=XXXXXX' --output text --query 'Reservations[].Instances[].[PrivateIpAddress,Tags[?Key==`Name`].Value[]]'
 // prob replace PrivateIpAdress with PublicIpAddress
-DAI_URL = 'http://34.201.139.15:12345'
+
+// TODO SP: use the puddle domain names except once the DNS problem is resolved for Mac or when running somewhere else
 // DAI_URL = 'http://stefan-puddle-dai-142-cpu-small2-puddle.h2o.ai:12345'
+DAI_URL = 'http://34.201.139.15:12345'
 DAI_USERNAME = 'h2oai'
 DAI_PASSWORD = 'i-0495a5469c1111c0a'
 S3_DATA_SET_LOCATION = 'https://s3.amazonaws.com/h2o-public-test-data/smalldata/kaggle/CreditCard/creditcard_train_cat.csv'
@@ -94,5 +96,18 @@ pipeline {
                 }
             }
         }
+
+        stage('deploy-mojo'){
+            agent { label NODE_LABEL }
+            steps {
+                script {
+                    echo "Deploying mojo to production."
+
+                    def UPLOAD_RESULT = sh(script: "python3 deploy_mojo.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${EXPERIMENT_NAME}", returnStdout: true).trim() as Double
+                    
+                    echo "Mojo successfully deployed to production."
+                }
+            }
+         }
     }
 }
