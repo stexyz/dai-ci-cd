@@ -7,7 +7,7 @@ address = sys.argv[1]
 
 #TODO SP: add params to Jenkins too
 username = 'h2oai'
-password = 'h2oai'
+password = 'i-0495a5469c1111c0a '
 h2oai = Client(address = address, username = username, password = password)
 # make sure to use the same user name and password when signing in through the GUI
 
