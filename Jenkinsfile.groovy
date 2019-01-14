@@ -89,12 +89,8 @@ pipeline {
                 script {
                     echo "Downloading mojo for experiment [${EXPERIMENT_NAME}]."
                     
-                    def EXPERIMENT_SCORE = sh(script: "python3 download_mojo.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${EXPERIMENT_NAME}", returnStdout: true).trim() as Double
-                    if (EXPERIMENT_SCORE <= 0.5){
-                        echo "Model score [${EXPERIMENT_SCORE}] was too low, failing pipeline build."
-                        exit 1;
-                    }
-                    echo "Model score [${EXPERIMENT_SCORE}] was good enough, proceeding with the pipeline."
+                    def MOJO_PATH = sh(script: "python3 download_mojo.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${EXPERIMENT_NAME}", returnStdout: true).trim() as Double
+                    echo "Mojo zip successfully downloaded at [${MOJO_PATH}]."
                 }
             }
         }
