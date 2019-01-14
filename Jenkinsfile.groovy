@@ -4,8 +4,8 @@ NODE_LABEL = 'master'
 // TODO: use CLI to get the IP based on instance id; https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-instances.html
 // or aws ec2 describe-instances --filters 'Name=tag:Name,Values=XXXXXX' --output text --query 'Reservations[].Instances[].[PrivateIpAddress,Tags[?Key==`Name`].Value[]]'
 // prob replace PrivateIpAdress with PublicIpAddress
-// DAI_URL = 'http://54.81.209.97:12345'
-DAI_URL = 'http://stefan-puddle-dai-142-cpu-small2-puddle.h2o.ai:12345'
+DAI_URL = 'http://34.201.139.15:12345'
+// DAI_URL = 'http://stefan-puddle-dai-142-cpu-small2-puddle.h2o.ai:12345'
 DAI_USERNAME = 'h2oai'
 DAI_PASSWORD = 'i-0495a5469c1111c0a'
 S3_DATA_SET_LOCATION = 'https://s3.amazonaws.com/h2o-public-test-data/smalldata/kaggle/CreditCard/creditcard_train_cat.csv'
