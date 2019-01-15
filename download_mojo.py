@@ -3,6 +3,7 @@ import h2oai_client
 import sys
 import requests
 import math
+# TODO: remove model params and interpret params for client init
 from h2oai_client import Client, ModelParameters, InterpretParameters
 
 address = sys.argv[1]
