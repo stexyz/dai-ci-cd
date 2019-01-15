@@ -128,10 +128,10 @@ pipeline {
             steps {
                 script {
                     ansiColor('green') {
-                        echo "Deploying mojo to production."
+                        echo "Deploying mojo to production. Mojo path is ${MOJO_PATH}."
                     }
 
-                    def UPLOAD_RESULT = sh(script: "python3 deploy_mojo.py ${MINIO_URL} ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY} ${MOJO_PATH} ${MINIO_MODEL_BUCKET} ${MINIO_MOJO_OBJECT}", returnStdout: true).trim()
+                    def UPLOAD_RESULT = sh(script: "python3 deploy_mojo.py ${MINIO_URL} ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY} \"${MOJO_PATH}\" ${MINIO_MODEL_BUCKET} ${MINIO_MOJO_OBJECT}", returnStdout: true).trim()
                     // TODO: check that the mojo file is really present at the S3 location
                     ansiColor('green') {
                         echo "Mojo successfully deployed to production."
