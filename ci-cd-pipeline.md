@@ -15,6 +15,7 @@ https://d1.awsstatic.com/Projects/P5505030/aws-project_Jenkins-build-server.pdf
 * Install recommended plugins
 * Install ansi-color plugin
 * Install virtualenv
+* Install boto3 (s3/minio client)
 
 * dependencies inside docker container (later put into dockerfile)
 	* Install Python3 (for DAI client)
@@ -61,6 +62,7 @@ Need to create a bucket named `model-bucket` into which we will be uploading new
 ### Future
 * on-demand DAI provisioning before experiment (a la puddle)
 * Use test dataset
+* version mojo files (don't replace)
 
 ## How-to Jenkins
 * `docker exec -u 0 -ti jenkins bash` gets the root console
@@ -80,3 +82,4 @@ https://s3.amazonaws.com/h2o-public-test-data/smalldata/kaggle/CreditCard/credit
 
 jenkins password: changeit123
 jenkins username: h2oai
+
