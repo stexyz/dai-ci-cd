@@ -12,6 +12,13 @@ DAI_USERNAME = 'h2oai'
 DAI_PASSWORD = 'i-0495a5469c1111c0a'
 S3_DATA_SET_LOCATION = 'https://s3.amazonaws.com/h2o-public-test-data/smalldata/kaggle/CreditCard/creditcard_train_cat.csv'
 GIT_REPO = 'https://github.com/stexyz/dai-ci-cd'
+
+MINIO_URL = 'http://localhost:9000'
+MINIO_ACCESS_KEY = 'accesskey'
+MINIO_SECRET_KEY = 'secretkey'
+MINIO_MODEL_BUCKET = 'model-bucket'
+MINIO_MOJO_OBJECT = 'model.mojo'
+
 def NEW_DATASET = null
 
 pipeline {
@@ -103,11 +110,20 @@ pipeline {
                 script {
                     echo "Deploying mojo to production."
 
-                    def UPLOAD_RESULT = sh(script: "python3 deploy_mojo.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${EXPERIMENT_NAME}", returnStdout: true).trim() as Double
-                    
+                    def UPLOAD_RESULT = sh(script: "python3 deploy_mojo.py ${MINIO_URL} ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY} ${MOJO_PATH} ${MINIO_MODEL_BUCKET} ${MINIO_MOJO_OBJECT}", returnStdout: true).trim() as Double
+                    // TODO: check that the mojo file is really present at the S3 location
                     echo "Mojo successfully deployed to production."
                 }
             }
          }
+
+         stage('upload-experiment-summary'){
+            agent { label NODE_LABEL }
+            steps {
+                script {
+                    echo "TODO: upload experiment summary to S3.."
+                }
+            }
+        }
     }
 }

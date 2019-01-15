@@ -1,19 +1,41 @@
-#TODO SP: check the imports, encapsulate the client generation into a separate file
-import h2oai_client
-import sys
-import requests
-import math
-from h2oai_client import Client, ModelParameters, InterpretParameters
+# Syntax:
+# deploy_mojo.py ${MINIO_URL} ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY} ${MOJO_PATH}
 
-address = sys.argv[1]
-username = sys.argv[2]
-password = sys.argv[3]
-h2oai = Client(address = address, username = username, password = password)
+# deploy mojo using these tutorials:
+# https://sysadmins.co.za/using-minios-python-sdk-to-interact-with-a-minio-s3-bucket/
+# https://docs.minio.io/docs/python-client-api-reference.html
+# https://docs.minio.io/docs/minio-select-api-quickstart-guide.html
 
-# load model summary and output the score
-# TODO: possibly do checks here if we need to validate more
-experiment_name = sys.argv[4]
+import boto3
 
-mojo_scoring_pipeline = h2oai.build_mojo_pipeline_sync(experiment_name)
-mojo_path = h2oai.download(mojo_scoring_pipeline.file_path, dest_dir=".")
-print(mojo_path)
+MINIO_URL = sys.argv[1]
+MINIO_ACCESS_KEY = sys.argv[2]
+MINIO_SECRET_KEY = sys.argv[3]
+MOJO_PATH = sys.argv[4]
+MODEL_BUCKET = sys.argv[5]
+MOJO_OBJECT_NAME = sys.argv[6]
+
+s3 = boto3.client('s3',
+                  endpoint_url=MINIO_URL,
+                  aws_access_key_id=MINIO_ACCESS_KEY,
+                  aws_secret_access_key=MINIO_ACCESS_KEY,
+                  region_name='us-east-1')
+
+
+# 1. remove the old mojo
+# 2. upload new mojo
+
+# Clearly for proper production use we would use some tagging to only keep adding new mojo files 
+# and our production app would select the latest mojo file to run the predictions; 
+# for sake of simplicity we compromise this transactional stability
+
+# Putting data to S3 with boto3
+# https://stackoverflow.com/questions/40336918/how-to-write-a-file-or-data-to-an-s3-object-using-boto3
+# https://boto3.amazonaws.com/v1/documentation/api/latest/guide/migrations3.html
+
+s3.Object('mybucket', MOJO_OBJECT_NAME).put(Body=open('/tmp/hello.txt', 'rb'))
+
+s3.
+
+
+print('success')
