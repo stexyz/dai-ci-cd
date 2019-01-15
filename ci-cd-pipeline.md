@@ -32,7 +32,8 @@ python3-pip
 wget http://34.239.181.231:12345/static/h2oai_client-1.4.2-py3-none-any.whl
 pip3 install h2oai_client-1.4.2-py3-none-any.whl
 ```
-
+### Setup new color schema for ANSI color 
+Used in Jenkinsfile.groovy, need to setup a schema named 'green'.
 
 ### Storage for mojo files
 Will aim to use AWS S3, but for demo purposes will use Minio, which is a free version of S3 running in Docker.

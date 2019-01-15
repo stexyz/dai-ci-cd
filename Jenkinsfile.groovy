@@ -27,7 +27,7 @@ pipeline {
 
     // Setup job options.
     options {
-        ansiColor('xterm')
+        ansiColor('green')
         timestamps()
         timeout(time: 60, unit: 'MINUTES')
         // holding last 10 builds
@@ -45,7 +45,7 @@ pipeline {
 
                     // checkout git
                     git "${GIT_REPO}"
-                    ansiColor('xterm') {
+                    ansiColor('green') {
                         echo 'Checked out github repo with scripts.'
                     }
                     //wget the python h2o_client and install it
@@ -61,7 +61,7 @@ pipeline {
             agent { label NODE_LABEL }
             steps {
                 script {
-                    ansiColor('xterm') {
+                    ansiColor('green') {
                         echo "Loading dataset [${S3_DATA_SET_LOCATION}] to Driverless AI running at ${DAI_URL}."
                     }
                     NEW_DATASET = sh(script: "python3 upload_new_dataset.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${S3_DATA_SET_LOCATION}", returnStdout: true).trim()
@@ -74,11 +74,11 @@ pipeline {
             agent { label NODE_LABEL }
             steps {
                 script {
-                    ansiColor('xterm') {
+                    ansiColor('green') {
                         echo "Training a DAI model with 1-1-10 settings on dataset [${NEW_DATASET}]."
                     }
                     EXPERIMENT_NAME = sh(script: "python3 run_experiment.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${NEW_DATASET} 1 1 10", returnStdout: true).trim()
-                    ansiColor('xterm') {
+                    ansiColor('green') {
                         echo "Experiment ${EXPERIMENT_NAME} finished."
                     }
                 }
@@ -89,17 +89,17 @@ pipeline {
             agent { label NODE_LABEL }
             steps {
                 script {
-                    ansiColor('xterm') {
+                    ansiColor('green') {
                         echo "Validating performance of the model ${EXPERIMENT_NAME}."
                     }
                     def EXPERIMENT_SCORE = sh(script: "python3 check_model_score.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${EXPERIMENT_NAME}", returnStdout: true).trim() as Double
                     if (EXPERIMENT_SCORE <= 0.5){
-                        ansiColor('xterm') {
+                        ansiColor('green') {
                             echo "Model score [${EXPERIMENT_SCORE}] was too low, failing pipeline build."
                         }
                         exit 1;
                     }
-                    ansiColor('xterm') {
+                    ansiColor('green') {
                         echo "Model score [${EXPERIMENT_SCORE}] was good enough, proceeding with the pipeline."
                     }
                 }
@@ -110,13 +110,13 @@ pipeline {
             agent { label NODE_LABEL }
             steps {
                 script {
-                    ansiColor('xterm') {
+                    ansiColor('green') {
                         echo "Downloading mojo for experiment [${EXPERIMENT_NAME}]."
                     }
                     
                     def MOJO_PATH = sh(script: "python3 download_mojo.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${EXPERIMENT_NAME}", returnStdout: true).trim()
                     
-                    ansiColor('xterm') {
+                    ansiColor('green') {
                         echo "Mojo zip successfully downloaded at [${MOJO_PATH}]."
                     }
                 }
@@ -127,13 +127,13 @@ pipeline {
             agent { label NODE_LABEL }
             steps {
                 script {
-                    ansiColor('xterm') {
+                    ansiColor('green') {
                         echo "Deploying mojo to production."
                     }
 
                     def UPLOAD_RESULT = sh(script: "python3 deploy_mojo.py ${MINIO_URL} ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY} ${MOJO_PATH} ${MINIO_MODEL_BUCKET} ${MINIO_MOJO_OBJECT}", returnStdout: true).trim()
                     // TODO: check that the mojo file is really present at the S3 location
-                    ansiColor('xterm') {
+                    ansiColor('green') {
                         echo "Mojo successfully deployed to production."
                     }
                 }
@@ -144,7 +144,7 @@ pipeline {
             agent { label NODE_LABEL }
             steps {
                 script {
-                    ansiColor('xterm') {
+                    ansiColor('green') {
                         echo "TODO: upload experiment summary to S3.."
                     }
                 }
