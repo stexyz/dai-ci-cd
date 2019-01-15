@@ -115,8 +115,9 @@ pipeline {
                     }
                     
                     def MOJO_PATH = sh(script: "python3 download_mojo.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${EXPERIMENT_NAME}", returnStdout: true).trim() as Double
+                    
                     ansiColor('xterm') {
-                        echo "Mojo zip successfully downloaded at [${MOJO_PATH}]."
+                        echo "Mojo zip successfully downloaded."// at [${MOJO_PATH}]."
                     }
                 }
             }
