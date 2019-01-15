@@ -114,7 +114,7 @@ pipeline {
                         echo "Downloading mojo for experiment [${EXPERIMENT_NAME}]."
                     }
                     
-                    def MOJO_PATH = sh(script: "python3 download_mojo.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${EXPERIMENT_NAME}", returnStdout: true).trim() as Double
+                    def MOJO_PATH = sh(script: "python3 download_mojo.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${EXPERIMENT_NAME}", returnStdout: true).trim()
                     
                     ansiColor('xterm') {
                         echo "Mojo zip successfully downloaded."// at [${MOJO_PATH}]."
@@ -131,7 +131,7 @@ pipeline {
                         echo "Deploying mojo to production."
                     }
 
-                    def UPLOAD_RESULT = sh(script: "python3 deploy_mojo.py ${MINIO_URL} ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY} ${MOJO_PATH} ${MINIO_MODEL_BUCKET} ${MINIO_MOJO_OBJECT}", returnStdout: true).trim() as Double
+                    def UPLOAD_RESULT = sh(script: "python3 deploy_mojo.py ${MINIO_URL} ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY} ${MOJO_PATH} ${MINIO_MODEL_BUCKET} ${MINIO_MOJO_OBJECT}", returnStdout: true).trim()
                     // TODO: check that the mojo file is really present at the S3 location
                     ansiColor('xterm') {
                         echo "Mojo successfully deployed to production."
