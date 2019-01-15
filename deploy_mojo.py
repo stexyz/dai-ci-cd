@@ -7,6 +7,7 @@
 # https://docs.minio.io/docs/minio-select-api-quickstart-guide.html
 
 import boto3
+import sys
 
 MINIO_URL = sys.argv[1]
 MINIO_ACCESS_KEY = sys.argv[2]
