@@ -13,7 +13,8 @@ DAI_PASSWORD = 'i-0495a5469c1111c0a'
 S3_DATA_SET_LOCATION = 'https://s3.amazonaws.com/h2o-public-test-data/smalldata/kaggle/CreditCard/creditcard_train_cat.csv'
 GIT_REPO = 'https://github.com/stexyz/dai-ci-cd'
 
-MINIO_URL = 'http://localhost:9000'
+// accessing minio by hostname which is a docker container name on the same docker network
+MINIO_URL = 'http://minio:9000'
 MINIO_ACCESS_KEY = 'accesskey'
 MINIO_SECRET_KEY = 'secretkey'
 MINIO_MODEL_BUCKET = 'model-bucket'

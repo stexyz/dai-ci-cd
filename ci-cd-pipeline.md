@@ -10,12 +10,18 @@ https://d1.awsstatic.com/Projects/P5505030/aws-project_Jenkins-build-server.pdf
 
 ## Steps
 
+### Create a docker network to link Jenkins and Minio
+```
+docker network create cicd-demo-network
+docker network connect cicd-demo-network dai-ci-cd-jenkins
+docker network connect cicd-demo-network minio
+```
+
 ### Set up Jenkins in docker
 * Use jenkins/jenkins:lts
 * Install recommended plugins
 * Install ansi-color plugin
 * Install virtualenv
-* Install boto3 (s3/minio client)
 
 * dependencies inside docker container (later put into dockerfile)
 	* Install Python3 (for DAI client)
@@ -25,14 +31,15 @@ https://d1.awsstatic.com/Projects/P5505030/aws-project_Jenkins-build-server.pdf
 	  * **TODO:** add it to dockerfile later.
 	* Install h2oai_client wheel
 	  * **TODO:** install this to virtualenv from DAI server
+	* Install boto3 (s3/minio client)
+	```
+	apt-get update
+	apt-get install python3
+	python3-pip
+	wget http://34.239.181.231:12345/static/h2oai_client-1.4.2-py3-none-any.whl
+	pip3 install h2oai_client-1.4.2-py3-none-any.whl
+	```
 
-```
-apt-get update
-apt-get install python3
-python3-pip
-wget http://34.239.181.231:12345/static/h2oai_client-1.4.2-py3-none-any.whl
-pip3 install h2oai_client-1.4.2-py3-none-any.whl
-```
 ### Setup new color schema for ANSI color 
 Used in Jenkinsfile.groovy, need to setup a schema named 'green'.
 
