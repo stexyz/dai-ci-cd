@@ -16,15 +16,14 @@ def load_csv_from_s3():
     response = obj.get()
     df = pd.read_csv(io.BytesIO(response['Body'].read()))
     return df
-#     lines = response['Body'].read().decode("utf-8").split()
-#     return lines
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
         self.write('<h1>H2O.ai Scoring Example</h1><br /><table>')
-        for row in csv.DictReader(load_csv_from_s3()):
+        df = load_csv_from_s3()
+        for index, row in df.head().iterrows():
             self.write('<tr>')
-            for item in csv.DictReader(row):
+            for index, item in row.items():
                 self.write('<td>')
                 self.write(item)
                 self.write('</td>')
