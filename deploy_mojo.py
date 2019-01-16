@@ -16,10 +16,16 @@ MOJO_PATH = sys.argv[4]
 MODEL_BUCKET = sys.argv[5]
 MOJO_OBJECT_NAME = sys.argv[6]
 
+# r3 = boto3.resource('s3',
+#                   endpoint_url=MINIO_URL,
+#                   aws_access_key_id=MINIO_ACCESS_KEY,
+#                   aws_secret_access_key=MINIO_ACCESS_KEY,
+#                   region_name='us-east-1')
+
 r3 = boto3.resource('s3',
-                  endpoint_url=MINIO_URL,
-                  aws_access_key_id=MINIO_ACCESS_KEY,
-                  aws_secret_access_key=MINIO_ACCESS_KEY,
+                  endpoint_url='http://minio:9000',
+                  aws_access_key_id='accesskey',
+                  aws_secret_access_key='secretkey',
                   region_name='us-east-1')
 
 # Clearly for proper production use we would use some tagging to only keep adding new mojo files 

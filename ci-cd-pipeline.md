@@ -34,10 +34,11 @@ docker network connect cicd-demo-network minio
 	* Install boto3 (s3/minio client)
 	```
 	apt-get update
-	apt-get install python3
-	python3-pip
-	wget http://34.239.181.231:12345/static/h2oai_client-1.4.2-py3-none-any.whl
+	apt install python3
+	apt install python3-pip
+	wget http://18.206.201.110:12345/static/h2oai_client-1.4.2-py3-none-any.whl
 	pip3 install h2oai_client-1.4.2-py3-none-any.whl
+	pip3 install boto3
 	```
 
 ### Setup new color schema for ANSI color 
