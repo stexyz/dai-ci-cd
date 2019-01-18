@@ -1,0 +1,22 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head> 
+    <title>Getting Started: Serving Web Content</title> 
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+    <h1 th:text="'Predictions, ' + ${old} + '!'" />
+    <p>Score: TBD</p>
+    <table>
+        <tr th:each="o : ${rows}" th:class="${oStat.odd}? 'odd'">
+            <td th:each="i : ${o}" th:text="${i}"></td>
+        </tr>
+    </table>
+    <!--<a th:href="@{/predictions(old='true', page='2')}">next</a>-->
+    <a th:href="'predictions?old=' + ${old} + '&page=' + ${page-1}" th:text="${page>1} ? 'previous':''"/>
+    <a th:href="'predictions?old=' + ${old} + '&page=' + ${page+1}" th:text="${page<maxPage} ? 'next':''"/>
+    <!--(id=${order.id},action=(${user.admin} ? 'show_all' : 'show_public'))}">-->
+    <!--<a href="'predictions.html?old=' + ${old} + '&page=' + ${old-1}" th:text="${page}>1?previous:"/>-->
+    <!--<a href="'predictions.html?old=' + ${old} + '&page=' + ${old+1}" th:text="${page}>10?next:"/>-->
+</body>
+</html>
