@@ -57,6 +57,8 @@ s3 = boto3.client('s3',
 
 Need to create a bucket named `model-bucket` into which we will be uploading new mojo files and experiment summaries.
 
+### Create Website
+* [SpringBoot Thymeleaf Templates]( https://www.thymeleaf.org/doc/articles/standardurlsyntax.html)
 
 ## Ideas
 

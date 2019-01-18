@@ -5,7 +5,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
-    <h1 th:text="'Predictions, ' + ${old} + '!'" />
+    <h1 th:text="${old} ? 'Predictions on old data.' : 'Predictions on new data.'" />
+    <a href="/">Home</a>
     <p>Score: TBD</p>
     <table>
         <tr th:each="o : ${rows}" th:class="${oStat.odd}? 'odd'">
