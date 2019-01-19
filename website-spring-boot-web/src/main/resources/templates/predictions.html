@@ -14,6 +14,6 @@
         </tr>
     </table>
     <a th:href="'predictions?old=' + ${old} + '&page=' + ${page-1}" th:text="${page>1} ? 'previous':''"/>
-    <a th:href="'predictions?old=' + ${old} + '&page=' + ${page+1}" th:text="${page<maxPage} ? 'next':''"/>
+    <a th:href="'predictions?old=' + ${old} + '&page=' + ${page+1}" th:text="${page<=maxPage} ? 'next':''"/>
 </body>
 </html>
