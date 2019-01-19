@@ -13,11 +13,7 @@
             <td th:each="i : ${o}" th:text="${i}"></td>
         </tr>
     </table>
-    <!--<a th:href="@{/predictions(old='true', page='2')}">next</a>-->
     <a th:href="'predictions?old=' + ${old} + '&page=' + ${page-1}" th:text="${page>1} ? 'previous':''"/>
     <a th:href="'predictions?old=' + ${old} + '&page=' + ${page+1}" th:text="${page<maxPage} ? 'next':''"/>
-    <!--(id=${order.id},action=(${user.admin} ? 'show_all' : 'show_public'))}">-->
-    <!--<a href="'predictions.html?old=' + ${old} + '&page=' + ${old-1}" th:text="${page}>1?previous:"/>-->
-    <!--<a href="'predictions.html?old=' + ${old} + '&page=' + ${old+1}" th:text="${page}>10?next:"/>-->
 </body>
 </html>
