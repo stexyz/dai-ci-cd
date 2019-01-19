@@ -59,6 +59,7 @@ Need to create a bucket named `model-bucket` into which we will be uploading new
 
 ### Create Website
 * [SpringBoot Thymeleaf Templates]( https://www.thymeleaf.org/doc/articles/standardurlsyntax.html)
+* [RMSE](https://github.com/haifengl/smile/blob/master/core/src/main/java/smile/validation/RMSE.java)
 
 ## Ideas
 
