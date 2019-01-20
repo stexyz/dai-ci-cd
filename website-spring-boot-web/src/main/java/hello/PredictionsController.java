@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -26,91 +28,72 @@ import java.util.stream.Collectors;
 @Controller
 public class PredictionsController {
 
-    private Integer pageSize = 20;
+    private static final Integer pageSize = 20;
+    private static final String oldDataSetName = "test-week1.csv";
+    private static final String newDataSetName = "test-week2.csv";
+    private static final String minioUrl = "http://localhost:9000";
+    private static final String accessKey = "accesskey";
+    private static final String secretKey = "secretkey";
+    private static final String dataBucket = "data-bucket";
+    private static final String cvsSplitBy = ",";
+    private static final String model_bucket = "model-bucket";
+    private static final String mojo_file_name_minio = "pipeline.mojo";
+    private static final String mojo_local_path = "/tmp/pipeline.mojo.local";
+
 
     @GetMapping("/predictions")
-    public String greeting(@RequestParam(name="old", required=false, defaultValue="true") Boolean old, @RequestParam(name="page", required=false, defaultValue="1") Integer page, Model model) {
+    public void predictions(@RequestParam(name="old", required=false, defaultValue="true") Boolean old, @RequestParam(name="page", required=false, defaultValue="1") Integer page, Model model) throws InvalidPortException, InvalidEndpointException, IOException, InvalidKeyException, NoSuchAlgorithmException, InsufficientDataException, InternalException, NoResponseException, InvalidBucketNameException, XmlPullParserException, ErrorResponseException, InvalidArgumentException, LicenseException {
+        List<List<String>> table = new ArrayList<>();
+        List<String> headers;
 
-        List<List<String>> table = new ArrayList<List<String>>();
-        MinioClient minioClient = null;
-        try {
-            minioClient = new MinioClient("http://localhost:9000", "accesskey", "secretkey");
-            minioClient.statObject("data-bucket", "test-week1.csv");
-            //TODO: test week number old/new
-            //TODO: add request param "cache" for pagination
-            InputStream dataSetStream = minioClient.getObject("data-bucket", "test-week1.csv");
-
+        MinioClient minioClient = new MinioClient(minioUrl, accessKey, secretKey);
+        String datasetName = old ? oldDataSetName : newDataSetName;
+        minioClient.statObject(dataBucket, datasetName);
+        //TODO: add request param "cache" for pagination
+        try(InputStream dataSetStream = minioClient.getObject(dataBucket, datasetName)) {
             BufferedReader br = new BufferedReader(new InputStreamReader(dataSetStream, "UTF-8"));
 
-
-            String cvsSplitBy = ",";
+            // read headers
             String line = br.readLine();
-            assert (line!=null);
-
+            assert (line != null);
             // using array list as it will be added values during prediction phase
-            List<String> headers = new ArrayList<>(Arrays.asList(line.split(cvsSplitBy)));
+            headers = new ArrayList<>(Arrays.asList(line.split(cvsSplitBy)));
             headers.add("Predictions");
+
+            //read rest of the data set
             while ((line = br.readLine()) != null) {
                 List<String> row = new ArrayList<>(Arrays.asList(line.split(cvsSplitBy)));
                 table.add(row);
             }
-            List<Double> predictions = predict(minioClient, table, headers);
-            List<Double> actuals = getActuals(table);
-            double rmse = get_rmse(actuals, predictions);
-            table = appendPredictions(predictions, table);
 
-            // Close the input stream.
-            dataSetStream.close();
-
-            assert(page > 0);
-
-            List<List<String>> rowsToDisplay = new ArrayList<>();
-            rowsToDisplay.add(headers);
-            rowsToDisplay.addAll(table.stream().skip(pageSize * (page - 1)).limit(pageSize).collect(Collectors.toList()));
-
-            Integer maxPage = table.size()/pageSize;
-
-            model.addAttribute("rmse", rmse);
-            model.addAttribute("old", old);
-            model.addAttribute("rows", rowsToDisplay);
-            model.addAttribute("page", page);
-            model.addAttribute("maxPage", maxPage);
-        } catch (InvalidEndpointException e) {
-            e.printStackTrace();
-        } catch (InvalidPortException e) {
-            e.printStackTrace();
-        } catch (InvalidBucketNameException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InsufficientDataException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (NoResponseException e) {
-            e.printStackTrace();
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (ErrorResponseException e) {
-            e.printStackTrace();
-        } catch (InternalException e) {
-            e.printStackTrace();
-        } catch (InvalidArgumentException e) {
-            e.printStackTrace();
-        } catch (LicenseException e) {
-            e.printStackTrace();
         }
-        return "predictions";
+
+        List<Double> predictions = predict(minioClient, table, headers);
+        List<Double> actuals = getActual(table);
+        double rmse = get_rmse(actuals, predictions);
+        table = appendPredictions(predictions, table);
+
+        assert (page > 0);
+
+        List<List<String>> rowsToDisplay = new ArrayList<>();
+        rowsToDisplay.add(headers);
+        rowsToDisplay.addAll(table.stream().skip(pageSize * (page - 1)).limit(pageSize).collect(Collectors.toList()));
+
+        Integer maxPage = table.size() / pageSize;
+
+        model.addAttribute("rmse", rmse);
+        model.addAttribute("old", old);
+        model.addAttribute("rows", rowsToDisplay);
+        model.addAttribute("page", page);
+        model.addAttribute("maxPage", maxPage);
     }
 
-    private List<Double> predict(MinioClient minioClient, List<List<String>> table, List<String> headers) throws IOException, LicenseException {
-        String model_bucket_old = "model-bucket-old";
-        String mojo_file_name = "pipeline.mojo";
+    private List<Double> predict(MinioClient minioClient, List<List<String>> table, List<String> headers) throws IOException, LicenseException, InvalidKeyException, NoSuchAlgorithmException, InsufficientDataException, InvalidArgumentException, InternalException, NoResponseException, InvalidBucketNameException, XmlPullParserException, ErrorResponseException {
+        Files.deleteIfExists(Paths.get(mojo_local_path));
+
         //download the mojo file to local drive to use for pipeline creation
-//        minioClient.getObject(model_bucket_old, mojo_file_name, "/tmp/pipeline.mojo.local");
-        MojoPipeline model = MojoPipeline.loadFrom("/tmp/pipeline.mojo.local");
+        minioClient.getObject(model_bucket, mojo_file_name_minio, mojo_local_path);
+        MojoPipeline model = MojoPipeline.loadFrom(mojo_local_path);
 
         MojoFrameBuilder frameBuilder = model.getInputFrameBuilder();
         for(List<String> row : table){
@@ -122,24 +105,24 @@ public class PredictionsController {
             frameBuilder.addRow(rowBuilder);
         }
 
-        MojoFrame iframe = frameBuilder.toMojoFrame();
-        MojoFrame oframe = model.transform(iframe);
+        MojoFrame iFrame = frameBuilder.toMojoFrame();
+        MojoFrame oFrame = model.transform(iFrame);
 
         List<Double> predictions = new ArrayList<>();
 
-        MojoColumn predictionCol = oframe.getColumn(0);
+        MojoColumn predictionCol = oFrame.getColumn(0);
         for (String p : predictionCol.getDataAsStrings()){
             predictions.add(Double.parseDouble(p));
         }
         return predictions;
     }
 
-    private List<Double> getActuals(List<List<String>> table){
-        List<Double> actuals = new ArrayList<>();
+    private List<Double> getActual(List<List<String>> table){
+        List<Double> actual = new ArrayList<>();
         for(List<String> row : table) {
-            actuals.add(Double.parseDouble(row.get(4)));
+            actual.add(Double.parseDouble(row.get(4)));
         }
-        return actuals;
+        return actual;
     }
 
     private List<List<String>> appendPredictions(List<Double> predictions, List<List<String>> table){
