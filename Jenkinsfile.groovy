@@ -1,5 +1,3 @@
-// 1. upload train dataset to DAI from Minio, not from web(s3 link)
-// 2. change the script for training model
 #!/usr/bin/groovy
 
 NODE_LABEL = 'master'
