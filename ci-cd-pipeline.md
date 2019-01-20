@@ -10,13 +10,6 @@ https://d1.awsstatic.com/Projects/P5505030/aws-project_Jenkins-build-server.pdf
 
 ## Steps
 
-### Create a docker network to link Jenkins and Minio
-```
-docker network create cicd-demo-network
-docker network connect cicd-demo-network dai-ci-cd-jenkins
-docker network connect cicd-demo-network minio
-```
-
 ### Set up Jenkins in docker
 * Use jenkins/jenkins:lts
 * Install recommended plugins
@@ -43,6 +36,13 @@ docker network connect cicd-demo-network minio
 
 ### Setup new color schema for ANSI color 
 Used in Jenkinsfile.groovy, need to setup a schema named 'green'.
+
+### Create a docker network to link Jenkins and Minio
+```
+docker network create cicd-demo-network
+docker network connect cicd-demo-network dai-ci-cd-jenkins
+docker network connect cicd-demo-network minio
+```
 
 ### Storage for mojo files
 Will aim to use AWS S3, but for demo purposes will use Minio, which is a free version of S3 running in Docker.
