@@ -26,7 +26,7 @@ r3 = boto3.resource('s3',
                   region_name='us-east-1')
 
 # Unzip the mojo.zip 
-zip_ref = zipfile.ZipFile('MOJO_PATH', 'r')
+zip_ref = zipfile.ZipFile(MOJO_PATH, 'r')
 zip_ref.extractall('.')
 zip_ref.close()
 
