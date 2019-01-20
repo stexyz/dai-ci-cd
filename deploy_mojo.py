@@ -8,6 +8,7 @@
 
 import boto3
 import sys
+import zipfile
 
 MINIO_URL = sys.argv[1]
 MINIO_ACCESS_KEY = sys.argv[2]
@@ -16,11 +17,18 @@ MOJO_PATH = sys.argv[4]
 MODEL_BUCKET = sys.argv[5]
 MOJO_OBJECT_NAME = sys.argv[6]
 
+
+
 r3 = boto3.resource('s3',
                   endpoint_url=MINIO_URL,
                   aws_access_key_id=MINIO_ACCESS_KEY,
                   aws_secret_access_key=MINIO_SECRET_KEY,
                   region_name='us-east-1')
+
+# Unzip the mojo.zip 
+zip_ref = zipfile.ZipFile('MOJO_PATH', 'r')
+zip_ref.extractall('.')
+zip_ref.close()
 
 # Clearly for proper production use we would use some tagging to only keep adding new mojo files 
 # and our production app would select the latest mojo file to run the predictions; 
@@ -33,6 +41,8 @@ r3 = boto3.resource('s3',
 # Rewriting the old mojo for now
 # https://stackoverflow.com/questions/23764683/are-writes-to-amazon-s3-atomic-all-or-nothing
 
-r3.Object(MODEL_BUCKET, MOJO_OBJECT_NAME).put(Body=open(MOJO_PATH, 'rb'))
+# Only upload pipeline.mojo
+MOJO_PIPELINE_LOCATION='./mojo-pipeline/pipeline.mojo'
+r3.Object(MODEL_BUCKET, MOJO_OBJECT_NAME).put(Body=open(MOJO_PIPELINE_LOCATION, 'rb'))
 
 print('success')

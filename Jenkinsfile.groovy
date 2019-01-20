@@ -109,7 +109,7 @@ pipeline {
             }
         }        
 
-        stage('download-mojo'){
+        stage('build-and-download-mojo'){
             agent { label NODE_LABEL }
             steps {
                 script {
