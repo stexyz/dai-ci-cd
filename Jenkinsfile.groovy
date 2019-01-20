@@ -95,9 +95,10 @@ pipeline {
                         echo "Validating performance of the model ${EXPERIMENT_NAME}."
                     }
                     def EXPERIMENT_SCORE = sh(script: "python3 check_model_score.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${EXPERIMENT_NAME}", returnStdout: true).trim() as Double
-                    if (EXPERIMENT_SCORE <= 0.5){
+                    // RMSE score expected to be under 3000, bad predictions with expired model beyond prediction horison are expected around 17000
+                    if (EXPERIMENT_SCORE > 5000){
                         ansiColor('green') {
-                            echo "Model score [${EXPERIMENT_SCORE}] was too low, failing pipeline build."
+                            echo "Model score [${EXPERIMENT_SCORE}] was not good enough, failing pipeline build."
                         }
                         exit 1;
                     }
