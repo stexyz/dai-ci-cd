@@ -1,10 +1,7 @@
+// 1. upload train dataset to DAI from Minio, not from web(s3 link)
 #!/usr/bin/groovy
 
 NODE_LABEL = 'master'
-// TODO: use CLI to get the IP based on instance id; https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-instances.html
-// or aws ec2 describe-instances --filters 'Name=tag:Name,Values=XXXXXX' --output text --query 'Reservations[].Instances[].[PrivateIpAddress,Tags[?Key==`Name`].Value[]]'
-// prob replace PrivateIpAdress with PublicIpAddress
-
 // TODO SP: use the puddle domain names except once the DNS problem is resolved for Mac or when running somewhere else
 // DAI_URL = 'http://stefan-puddle-dai-142-cpu-small2-puddle.h2o.ai:12345'
 DAI_URL = 'http://18.206.201.110:12345'
@@ -18,7 +15,7 @@ MINIO_URL = 'http://minio:9000'
 MINIO_ACCESS_KEY = 'accesskey'
 MINIO_SECRET_KEY = 'secretkey'
 MINIO_MODEL_BUCKET = 'model-bucket'
-MINIO_MOJO_OBJECT = 'model.mojo'
+MINIO_MOJO_OBJECT = 'pipeline.mojo'
 
 def NEW_DATASET = null
 
