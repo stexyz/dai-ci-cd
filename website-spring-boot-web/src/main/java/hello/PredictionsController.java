@@ -7,11 +7,8 @@ import ai.h2o.mojos.runtime.frame.MojoFrame;
 import ai.h2o.mojos.runtime.frame.MojoFrameBuilder;
 import ai.h2o.mojos.runtime.frame.MojoRowBuilder;
 import ai.h2o.mojos.runtime.lic.LicenseException;
-import ai.h2o.mojos.runtime.readers.InMemoryMojoReaderBackend;
-import ai.h2o.mojos.runtime.readers.MojoReaderBackend;
 import io.minio.MinioClient;
 import io.minio.errors.*;
-import org.apache.commons.collections.ArrayStack;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +36,8 @@ public class PredictionsController {
         try {
             minioClient = new MinioClient("http://localhost:9000", "accesskey", "secretkey");
             minioClient.statObject("data-bucket", "test-week1.csv");
+            //TODO: test week number old/new
+            //TODO: add request param "cache" for pagination
             InputStream dataSetStream = minioClient.getObject("data-bucket", "test-week1.csv");
 
             BufferedReader br = new BufferedReader(new InputStreamReader(dataSetStream, "UTF-8"));
@@ -55,8 +54,10 @@ public class PredictionsController {
                 List<String> row = new ArrayList<>(Arrays.asList(line.split(cvsSplitBy)));
                 table.add(row);
             }
-            double rmse = -1;
-            table = predict(minioClient, table, headers, rmse);
+            List<Double> predictions = predict(minioClient, table, headers);
+            List<Double> actuals = getActuals(table);
+            double rmse = get_rmse(actuals, predictions);
+            table = appendPredictions(predictions, table);
 
             // Close the input stream.
             dataSetStream.close();
@@ -104,17 +105,13 @@ public class PredictionsController {
         return "predictions";
     }
 
-    private List<List<String>> predict(MinioClient minioClient, List<List<String>> table, List<String> headers, Double rmse) throws IOException, InvalidKeyException, NoSuchAlgorithmException, InsufficientDataException, InvalidArgumentException, InternalException, NoResponseException, InvalidBucketNameException, XmlPullParserException, ErrorResponseException, LicenseException {
-
-        //1. read mojo
+    private List<Double> predict(MinioClient minioClient, List<List<String>> table, List<String> headers) throws IOException, LicenseException {
         String model_bucket_old = "model-bucket-old";
         String mojo_file_name = "pipeline.mojo";
         //download the mojo file to local drive to use for pipeline creation
 //        minioClient.getObject(model_bucket_old, mojo_file_name, "/tmp/pipeline.mojo.local");
         MojoPipeline model = MojoPipeline.loadFrom("/tmp/pipeline.mojo.local");
 
-        List<Double> actuals = new ArrayList<>();
-        //go row by row and create predictions
         MojoFrameBuilder frameBuilder = model.getInputFrameBuilder();
         for(List<String> row : table){
             MojoRowBuilder rowBuilder = frameBuilder.getMojoRowBuilder();
@@ -123,27 +120,32 @@ public class PredictionsController {
                 rowBuilder.setValue(headers.get(colNum++), cell);
             }
             frameBuilder.addRow(rowBuilder);
-            actuals.add(Double.parseDouble(row.get(4)));
         }
 
         MojoFrame iframe = frameBuilder.toMojoFrame();
-
-//        iframe.debug();
-
         MojoFrame oframe = model.transform(iframe);
-//        oframe.debug();
 
-        //compute RMSE
         List<Double> predictions = new ArrayList<>();
 
         MojoColumn predictionCol = oframe.getColumn(0);
-        int i = 0;
         for (String p : predictionCol.getDataAsStrings()){
             predictions.add(Double.parseDouble(p));
-            table.get(i++).add(p);
         }
-        rmse = get_rmse(actuals, predictions);
-        System.out.println("RMSE="+rmse);
+        return predictions;
+    }
+
+    private List<Double> getActuals(List<List<String>> table){
+        List<Double> actuals = new ArrayList<>();
+        for(List<String> row : table) {
+            actuals.add(Double.parseDouble(row.get(4)));
+        }
+        return actuals;
+    }
+
+    private List<List<String>> appendPredictions(List<Double> predictions, List<List<String>> table){
+        for(int i = 0; i < table.size(); i++){
+            table.get(i).add(predictions.get(i).toString());
+        }
         return table;
     }
 
