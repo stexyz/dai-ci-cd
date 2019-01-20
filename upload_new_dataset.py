@@ -27,7 +27,7 @@ r3.Bucket(bucket).download_file(object_name, object_name)
 h2oai = Client(address = address, username = username, password = password)
 
 # read dataset from s3
-dataset = h2oai.upload_dataset(object_name)
+dataset = h2oai.upload_dataset_sync(object_name)
 
 # output the key of the dataset so that next build step in Jenkins can use it
 print(dataset)
