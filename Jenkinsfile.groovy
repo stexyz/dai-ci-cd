@@ -74,9 +74,9 @@ pipeline {
             steps {
                 script {
                     ansiColor('green') {
-                        echo "Training a DAI model with 1-1-10 settings on dataset [${NEW_DATASET}]."
+                        echo "Training a DAI model with 1-1-5 settings on dataset [${NEW_DATASET}]."
                     }
-                    EXPERIMENT_NAME = sh(script: "python3 run_experiment.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${NEW_DATASET} 1 1 10", returnStdout: true).trim()
+                    EXPERIMENT_NAME = sh(script: "python3 run_experiment.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${NEW_DATASET} 1 1 5", returnStdout: true).trim()
                     ansiColor('green') {
                         echo "Experiment ${EXPERIMENT_NAME} finished."
                     }
