@@ -40,46 +40,54 @@ public class PredictionsController {
     private static final String mojo_file_name_minio = "pipeline.mojo";
     private static final String mojo_local_path = "/tmp/pipeline.mojo.local";
 
+    // caching these values so that pagination works fast
+    List<List<String>> table;
+    List<String> headers;
+    Integer maxPage;
+    Double rmse;
 
     @GetMapping("/predictions")
-    public void predictions(@RequestParam(name="old", required=false, defaultValue="true") Boolean old, @RequestParam(name="page", required=false, defaultValue="1") Integer page, Model model) throws InvalidPortException, InvalidEndpointException, IOException, InvalidKeyException, NoSuchAlgorithmException, InsufficientDataException, InternalException, NoResponseException, InvalidBucketNameException, XmlPullParserException, ErrorResponseException, InvalidArgumentException, LicenseException {
-        List<List<String>> table = new ArrayList<>();
-        List<String> headers;
+    public void predictions(@RequestParam(name="old", required=false, defaultValue="true") Boolean old, @RequestParam(name="page", required=false, defaultValue="1") Integer page, @RequestParam(name="cache", required=false, defaultValue="false") Boolean cache, Model model) throws InvalidPortException, InvalidEndpointException, IOException, InvalidKeyException, NoSuchAlgorithmException, InsufficientDataException, InternalException, NoResponseException, InvalidBucketNameException, XmlPullParserException, ErrorResponseException, InvalidArgumentException, LicenseException {
+        if (!cache) {
+            System.out.println("predicting.....");
+            System.out.println("old RMSE=" + rmse);
+            table = new ArrayList<>();
 
-        MinioClient minioClient = new MinioClient(minioUrl, accessKey, secretKey);
-        String datasetName = old ? oldDataSetName : newDataSetName;
-        minioClient.statObject(dataBucket, datasetName);
-        //TODO: add request param "cache" for pagination
-        try(InputStream dataSetStream = minioClient.getObject(dataBucket, datasetName)) {
-            BufferedReader br = new BufferedReader(new InputStreamReader(dataSetStream, "UTF-8"));
+            MinioClient minioClient = new MinioClient(minioUrl, accessKey, secretKey);
+            String datasetName = old ? oldDataSetName : newDataSetName;
+            minioClient.statObject(dataBucket, datasetName);
+            try (InputStream dataSetStream = minioClient.getObject(dataBucket, datasetName)) {
+                BufferedReader br = new BufferedReader(new InputStreamReader(dataSetStream, "UTF-8"));
 
-            // read headers
-            String line = br.readLine();
-            assert (line != null);
-            // using array list as it will be added values during prediction phase
-            headers = new ArrayList<>(Arrays.asList(line.split(cvsSplitBy)));
-            headers.add("Predictions");
+                // read headers
+                String line = br.readLine();
+                assert (line != null);
+                // using array list as it will be added values during prediction phase
+                headers = new ArrayList<>(Arrays.asList(line.split(cvsSplitBy)));
+                headers.add("Predictions");
 
-            //read rest of the data set
-            while ((line = br.readLine()) != null) {
-                List<String> row = new ArrayList<>(Arrays.asList(line.split(cvsSplitBy)));
-                table.add(row);
+                //read rest of the data set
+                while ((line = br.readLine()) != null) {
+                    List<String> row = new ArrayList<>(Arrays.asList(line.split(cvsSplitBy)));
+                    table.add(row);
+                }
+
             }
 
+            List<Double> predictions = predict(minioClient, table, headers);
+            List<Double> actuals = getActual(table);
+            rmse = get_rmse(actuals, predictions);
+            table = appendPredictions(predictions, table);
+
+            assert (page > 0);
+
+
+            maxPage = table.size() / pageSize;
         }
-
-        List<Double> predictions = predict(minioClient, table, headers);
-        List<Double> actuals = getActual(table);
-        double rmse = get_rmse(actuals, predictions);
-        table = appendPredictions(predictions, table);
-
-        assert (page > 0);
 
         List<List<String>> rowsToDisplay = new ArrayList<>();
         rowsToDisplay.add(headers);
         rowsToDisplay.addAll(table.stream().skip(pageSize * (page - 1)).limit(pageSize).collect(Collectors.toList()));
-
-        Integer maxPage = table.size() / pageSize;
 
         model.addAttribute("rmse", rmse);
         model.addAttribute("old", old);
