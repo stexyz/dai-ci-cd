@@ -22,12 +22,14 @@ r3 = boto3.resource('s3',
                   region_name='us-east-1')
 
 # to utilise the local s3 (minio) we need to download the file locally (easier than set up bucket policy and generate unexpirable url)
+
+# read dataset from s3
 r3.Bucket(bucket).download_file(object_name, object_name)
 
 h2oai = Client(address = address, username = username, password = password)
 
-# read dataset from s3
+# upload dataset to DAI
 dataset = h2oai.upload_dataset_sync(object_name)
 
 # output the key of the dataset so that next build step in Jenkins can use it
-print(dataset)
+print(dataset.key)
