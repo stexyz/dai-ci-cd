@@ -37,6 +37,12 @@ https://d1.awsstatic.com/Projects/P5505030/aws-project_Jenkins-build-server.pdf
 ### Setup new color schema for ANSI color 
 Used in Jenkinsfile.groovy, need to setup a schema named 'green'.
 
+### Import pipeline
+`java -jar jenkins-cli.jar -s http://localhost:8080/ -auth h2oai:11374f4488d177892507207ae563f9377d create-job dai-ci-cd-pipeline < /tmp/jenkins_home.backup/jobs/dai-test-ci_cd-pipeline/config.xml`
+
+### Import AnsiColor settings
+* location `JENKINS_HOME/hudson.plugins.ansicolor.AnsiColorBuildWrapper.xml`
+
 ### Create a docker network to link Jenkins and Minio
 ```
 docker network create cicd-demo-network

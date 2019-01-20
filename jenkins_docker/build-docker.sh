@@ -1,1 +1,1 @@
-docker build -t jenkins/h2o:v1 .
+docker build -t jenkins/h2o:v2 .
