@@ -61,9 +61,12 @@ pipeline {
             steps {
                 script {
                     ansiColor('green') {
-                        echo "Loading dataset [${DATA_FILE_TRAINING}] from bucket [${DATA_BUCKET_TRAINING}] to Driverless AI running at ${DAI_URL}."
+                        echo "Uploading dataset [${DATA_FILE_TRAINING}] from bucket [${DATA_BUCKET_TRAINING}] to Driverless AI running at ${DAI_URL}."
                     }
                     NEW_DATASET = sh(script: "python3 upload_new_dataset.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${DATA_BUCKET_TRAINING} ${DATA_FILE_TRAINING} ${MINIO_URL} ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY}", returnStdout: true).trim()
+                    ansiColor('green') {
+                        echo "UpLoading dataset done, dataset key is [${NEW_DATASET}]."
+                    }                
                 }
             }
         }
