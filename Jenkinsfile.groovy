@@ -1,4 +1,5 @@
 // 1. upload train dataset to DAI from Minio, not from web(s3 link)
+// 2. change the script for training model
 #!/usr/bin/groovy
 
 NODE_LABEL = 'master'
@@ -7,7 +8,9 @@ NODE_LABEL = 'master'
 DAI_URL = 'http://18.206.201.110:12345'
 DAI_USERNAME = 'h2oai'
 DAI_PASSWORD = 'i-0495a5469c1111c0a'
-S3_DATA_SET_LOCATION = 'https://s3.amazonaws.com/h2o-public-test-data/smalldata/kaggle/CreditCard/creditcard_train_cat.csv'
+
+DATA_BUCKET_TRAINING='data-bucket'
+DATA_FILE_TRAINING='train.csv'
 GIT_REPO = 'https://github.com/stexyz/dai-ci-cd'
 
 // accessing minio by hostname which is a docker container name on the same docker network
@@ -60,9 +63,9 @@ pipeline {
             steps {
                 script {
                     ansiColor('green') {
-                        echo "Loading dataset [${S3_DATA_SET_LOCATION}] to Driverless AI running at ${DAI_URL}."
+                        echo "Loading dataset [${DATA_FILE_TRAINING}] from bucket [${DATA_BUCKET_TRAINING}] to Driverless AI running at ${DAI_URL}."
                     }
-                    NEW_DATASET = sh(script: "python3 upload_new_dataset.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${S3_DATA_SET_LOCATION}", returnStdout: true).trim()
+                    NEW_DATASET = sh(script: "python3 upload_new_dataset.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${DATA_BUCKET_TRAINING} ${DATA_FILE_TRAINING} ${MINIO_URL} ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY}", returnStdout: true).trim()
                 }
             }
         }
