@@ -3,6 +3,7 @@ import h2oai_client
 import sys
 import requests
 import math
+import boto3
 from h2oai_client import Client, ModelParameters, InterpretParameters
 
 address = sys.argv[1]
