@@ -1,0 +1,2 @@
+Add VM parameters when running the web app:
+-Dserver.port=9009 -Dai.h2o.mojos.runtime.license.file=/path to license

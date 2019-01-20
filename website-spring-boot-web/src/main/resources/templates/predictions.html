@@ -7,7 +7,7 @@
 <body>
     <h1 th:text="${old} ? 'Predictions on old data.' : 'Predictions on new data.'" />
     <a href="/">Home</a>
-    <p>Score: TBD</p>
+    <p th:text="'Score [RMSE]:' + ${rmse}" />
     <table>
         <tr th:each="o : ${rows}" th:class="${oStat.odd}? 'odd'">
             <td th:each="i : ${o}" th:text="${i}"></td>
