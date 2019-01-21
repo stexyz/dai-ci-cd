@@ -117,7 +117,7 @@ pipeline {
                         echo "Downloading mojo for experiment [${EXPERIMENT_NAME}]."
                     }
                     
-                    MOJO_PATH = sh(script: "python3 jenkins_pipeline/ownload_mojo.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${EXPERIMENT_NAME}", returnStdout: true).trim()
+                    MOJO_PATH = sh(script: "python3 jenkins_pipeline/download_mojo.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${EXPERIMENT_NAME}", returnStdout: true).trim()
                     
                     ansiColor('green') {
                         echo "Mojo zip successfully downloaded at [${MOJO_PATH}]."
