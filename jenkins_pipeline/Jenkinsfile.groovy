@@ -63,7 +63,7 @@ pipeline {
                     ansiColor('green') {
                         echo "Uploading dataset [${DATA_FILE_TRAINING}] from bucket [${DATA_BUCKET_TRAINING}] to Driverless AI running at ${DAI_URL}."
                     }
-                    NEW_DATASET = sh(script: "python3 upload_new_dataset.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${DATA_BUCKET_TRAINING} ${DATA_FILE_TRAINING} ${MINIO_URL} ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY}", returnStdout: true).trim()
+                    NEW_DATASET = sh(script: "python3 jenkins_pipeline/upload_new_dataset.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${DATA_BUCKET_TRAINING} ${DATA_FILE_TRAINING} ${MINIO_URL} ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY}", returnStdout: true).trim()
                     ansiColor('green') {
                         echo "UpLoading dataset done, dataset key is [${NEW_DATASET}]."
                     }                
@@ -79,7 +79,7 @@ pipeline {
                     ansiColor('green') {
                         echo "Training a DAI model with 1-1-5 settings on dataset [${NEW_DATASET}]."
                     }
-                    EXPERIMENT_NAME = sh(script: "python3 run_experiment.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${NEW_DATASET} 1 1 5", returnStdout: true).trim()
+                    EXPERIMENT_NAME = sh(script: "python3 jenkins_pipeline/run_experiment.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${NEW_DATASET} 1 1 5", returnStdout: true).trim()
                     ansiColor('green') {
                         echo "Experiment ${EXPERIMENT_NAME} finished."
                     }
@@ -94,7 +94,7 @@ pipeline {
                     ansiColor('green') {
                         echo "Validating performance of the model ${EXPERIMENT_NAME}."
                     }
-                    def EXPERIMENT_SCORE = sh(script: "python3 check_model_score.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${EXPERIMENT_NAME}", returnStdout: true).trim() as Double
+                    def EXPERIMENT_SCORE = sh(script: "python3 jenkins_pipeline/check_model_score.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${EXPERIMENT_NAME}", returnStdout: true).trim() as Double
                     // RMSE score expected to be under 3000, bad predictions with expired model beyond prediction horison are expected around 17000
                     if (EXPERIMENT_SCORE > 5000){
                         ansiColor('green') {
@@ -117,7 +117,7 @@ pipeline {
                         echo "Downloading mojo for experiment [${EXPERIMENT_NAME}]."
                     }
                     
-                    MOJO_PATH = sh(script: "python3 download_mojo.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${EXPERIMENT_NAME}", returnStdout: true).trim()
+                    MOJO_PATH = sh(script: "python3 jenkins_pipeline/ownload_mojo.py ${DAI_URL} ${DAI_USERNAME} ${DAI_PASSWORD} ${EXPERIMENT_NAME}", returnStdout: true).trim()
                     
                     ansiColor('green') {
                         echo "Mojo zip successfully downloaded at [${MOJO_PATH}]."
@@ -134,7 +134,7 @@ pipeline {
                         echo "Deploying mojo to production."
                     }
 
-                    def UPLOAD_RESULT = sh(script: "python3 deploy_mojo.py ${MINIO_URL} ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY} \"${MOJO_PATH}\" ${MINIO_MODEL_BUCKET} ${MINIO_MOJO_OBJECT}", returnStdout: true).trim()
+                    def UPLOAD_RESULT = sh(script: "python3 jenkins_pipeline/deploy_mojo.py ${MINIO_URL} ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY} \"${MOJO_PATH}\" ${MINIO_MODEL_BUCKET} ${MINIO_MOJO_OBJECT}", returnStdout: true).trim()
                     // TODO: check that the mojo file is really present at the S3 location
                     ansiColor('green') {
                         echo "Mojo successfully deployed to production."
@@ -142,16 +142,5 @@ pipeline {
                 }
             }
          }
-
-         stage('upload-experiment-summary'){
-            agent { label NODE_LABEL }
-            steps {
-                script {
-                    ansiColor('green') {
-                        echo "TODO: upload experiment summary to S3.."
-                    }
-                }
-            }
-        }
     }
 }
