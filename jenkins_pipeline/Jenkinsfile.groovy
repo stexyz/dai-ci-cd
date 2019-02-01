@@ -3,7 +3,7 @@
 NODE_LABEL = 'master'
 // TODO SP: use the puddle domain names except once the DNS problem is resolved for Mac or when running somewhere else
 // DAI_URL = 'http://stefan-puddle-dai-142-cpu-small2-puddle.h2o.ai:12345'
-DAI_URL = 'http://18.209.33.0:12345'
+DAI_URL = 'http://54.196.56.150:12345'
 DAI_USERNAME = 'h2oai'
 DAI_PASSWORD = 'h2oai'
 
