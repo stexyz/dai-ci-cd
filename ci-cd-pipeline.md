@@ -38,7 +38,9 @@ https://d1.awsstatic.com/Projects/P5505030/aws-project_Jenkins-build-server.pdf
 Used in Jenkinsfile.groovy, need to setup a schema named 'green'.
 
 ### Import pipeline
-`java -jar jenkins-cli.jar -s http://localhost:8080/ -auth h2oai:11374f4488d177892507207ae563f9377d create-job dai-ci-cd-pipeline < git-root/jenkins_pipeline/pipeline-backup/config.xml`
+`java -jar jenkins_home/war/jenkins-cli.jar -s http://localhost:8080/ -auth h2oai:11374f4488d177892507207ae563f9377d create-job dai-ci-cd-pipeline < git-root/jenkins_pipeline/pipeline-backup/config.xml`
+
+Get the API code here: http://localhost:8080/user/h2oai/configure by generating a new one.
 
 ### Import AnsiColor settings
 * location `JENKINS_HOME/hudson.plugins.ansicolor.AnsiColorBuildWrapper.xml`
@@ -80,6 +82,9 @@ Need to create a bucket named `model-bucket` into which we will be uploading new
 * on-demand DAI provisioning before experiment (a la puddle)
 * Use test dataset
 * version mojo files (don't replace)
+* implement model retraining (topping-up)
+* different triggers
+  * 
 
 ## How-to Jenkins
 * `docker exec -u 0 -ti jenkins bash` gets the root console
